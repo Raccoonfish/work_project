@@ -1,0 +1,39 @@
+- name: Check docker compose
+  command: docker compose version
+  failed_when: false
+  changed_when: false
+  register: compose_version_output
+
+# - name: Install docker
+#   package:
+#     name: docker
+#     state: present
+
+- name: Enable docker service
+  systemd:
+    name: docker
+    enabled: yes
+    state: started
+
+#
+# INSTAL DOCKER COMPOSE
+#
+- name: Create directory for plugins
+  file:
+    path: /usr/local/lib/docker/cli-plugins/
+    state: directory
+    recurse: yes
+
+- name: Download compose plugin
+  get_url:
+    url: "{{ artifactory_url }}/app/docker-compose-2.7.0"
+    dest: /tmp/docker-compose-2.7.0
+    mode: 755
+
+- name: Upload etl files to target
+  copy:
+    remote_src: yes
+    src: /tmp/docker-compose-2.7.0
+    dest: /usr/local/lib/docker/cli-plugins/docker-compose
+    mode: 755
+  when: compose_version_output.rc != 0

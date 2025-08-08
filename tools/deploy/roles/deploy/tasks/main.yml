@@ -1,0 +1,96 @@
+#
+# DOCKER LOGIN
+#
+- name: DOCKER LOGIN - Save docker registry pass in tmp file
+  community.docker.docker_login:
+    registry_url: http://artifactory.infinnity.ru
+    username: e.ishemgulova
+    password: <fhhfrelf1!
+
+# - name: DOCKER LOGIN - Docker login
+#   shell: cat /tmp/drp.txt | docker login --username {{ registry_user }} --password-stdin {{ registry_host }}
+#   changed_when: false
+
+# - name: DOCKER LOGIN - Remove temporary pass file
+#   file:
+#     path: /tmp/drp.txt
+#     state: absent
+
+- name: Creates directory
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+  - "{{ project_dir }}"
+
+- name: Create config directories for prometheus_stack
+  ansible.builtin.file:
+    path: "{{ project_dir }}/prometheus_stack/{{ item }}"
+    state: directory
+    recurse: yes
+  loop:
+  - prometheus
+  - grafana
+  - grafana/provisioning
+  - grafana/plugins
+  - alertmanager
+  - config/victoriametrics
+  - data/victoriametrics
+
+- name: Copy Prometheus configs
+  ansible.builtin.copy:
+    src: "prometheus_stack/prometheus/"
+    dest: "{{ project_dir }}/prometheus_stack/prometheus/"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Copy prometheus_stack to remote target
+  copy:
+    src: prometheus_stack/prometheus
+    dest: "{{ project_dir }}/prometheus_stack/prometheus/"
+
+- name: copy docker-compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ project_dir }}/docker-compose.yml"
+
+- name: Deploy docker-compose file from template
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ project_dir }}/docker-compose.yml"
+  become: true
+
+- name: Build app with Compose
+  command: "docker compose up -d"
+  args:
+    chdir: "{{ project_dir }}"
+  register: status
+
+- name: Check if Grafana up
+  ansible.builtin.uri:
+    url: http://10.222.222.70:3000/login
+    method: GET
+    return_content: no
+    status_code: 200
+
+- name: Check if Counter up
+  ansible.builtin.uri:
+    url: http://10.222.222.70:7000/metrics
+    method: GET
+    return_content: no
+    status_code: 200
+
+- name: Check if Java up
+  ansible.builtin.uri:
+    url: http://10.222.222.70:8080/metrics
+    method: GET
+    return_content: no
+    status_code: 200
+
+- name: Check if Java_metrics up
+  ansible.builtin.uri:
+    url: http://10.222.222.70:9404/metrics
+    method: GET
+    return_content: no
+    status_code: 200

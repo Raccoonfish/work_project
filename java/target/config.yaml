@@ -1,0 +1,10 @@
+startDelaySeconds: 0
+lowercaseOutputName: true
+lowercaseOutputLabelNames: true
+rules:
+- pattern: '.*'
+
+# - pattern: 'java.lang<type=Memory><HeapMemoryUsage>'
+#   name: jvm_memory_usage_bytes
+#   type: GAUGE
+#   attr: used

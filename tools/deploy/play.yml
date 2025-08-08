@@ -1,0 +1,37 @@
+- hosts: 10.222.222.70
+  tags: [ never, initial ]
+  become: yes
+  vars:
+    artifactory_url: http://artifactory.infinnity.ru
+  roles:
+  - initial
+
+- hosts: 10.222.222.70
+  tags: java
+  become: yes
+  vars:
+    path_to_image: "{{ java_image_name }}"
+    app_version: "{{ java_image_tag }}"
+    app: "{{ java_app_dir }}"
+  roles:
+  - build-push
+
+- hosts: 10.222.222.70
+  tags: python
+  become: yes
+  vars:
+    path_to_image: "{{ python_image_name }}"
+    app_version: "{{ python_image_tag }}"
+    app: "{{ python_app_dir }}"
+  roles:
+  - build-push
+
+- hosts: 10.222.222.70
+  become: yes
+  vars:
+    java_name: "{{ java_image_name }}"
+    java_tag: "{{ java_image_tag }}"
+    python_name: "{{ python_image_name }}"
+    python_tag: "{{ python_image_tag }}"
+  roles:
+  - deploy

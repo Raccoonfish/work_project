@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  victoriametrics:
+    container_name: victoriametrics
+    image: victoriametrics/victoria-metrics:v1.91.2
+    restart: always
+    volumes:
+      - {{ project_dir }}/prometheus_stack/prometheus:/config
+    command: |
+      -promscrape.config /config/prometheus.yml
+    ports:
+      - 8428:8428
+    networks:
+      - default
+
+  node-exporter:
+    image: prom/node-exporter
+    container_name: exporter
+    hostname: exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - --web.listen-address=:9110
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)
+    ports:
+      - 9110:9110
+    restart: unless-stopped
+    networks:
+      - default
+
+
+  grafana:
+    image: grafana/grafana
+    user: root
+    depends_on:
+      - victoriametrics
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    container_name: grafana
+    hostname: grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=secret
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+    networks:
+      - default
+      
+  python_app:
+    image: {{registry_host}}/{{python_name}}:{{python_tag}}
+    container_name: python_app
+    restart: unless-stopped
+    ports:
+      - "7000:7000"  
+    networks:
+      - default     
+
+
+  java_app:
+    image: {{registry_host}}/{{java_name}}:{{java_tag}}
+    container_name: java_app
+    restart: always
+    ports:
+      - "8080:8080"
+      - "9404:9404"
+    expose:
+      - "9404"
+    networks: 
+     - default
+
+networks: 
+  default:
+    driver: bridge

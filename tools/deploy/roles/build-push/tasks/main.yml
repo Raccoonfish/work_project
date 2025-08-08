@@ -1,0 +1,26 @@
+- name: Login into registry
+  docker_login:
+    registry_url: "{{ artifactory_url }}"
+    username: "{{ registry_user }}"
+    password: "{{ registry_pass }}"
+    reauthorize: yes
+  delegate_to: 127.0.0.1
+
+- name: "Build docker image {{ app }}"
+  command: docker build -t {{ registry_host }}/{{ path_to_image }}:{{ app_version }} ../../{{ app }}
+  delegate_to: 127.0.0.1
+  # community.docker.docker_image_build:
+  #   name: "{{registry_host}}/{{ path_to_image }}"
+  #   tag: "{{ app_version }}"
+  #   path: "../../{{ app }}"
+
+- name: Push Docker image {{ app }}
+  command: docker push {{registry_host}}/{{ path_to_image }}:{{ app_version }}
+  delegate_to: 127.0.0.1
+  # community.docker.docker_image:
+  #   name: "{{registry_host}}/{{ path_to_image }}"
+  #   tag: "{{ app_version }}"
+  #   source: local
+  #   push: true
+  # delegate_to: 127.0.0.1
+

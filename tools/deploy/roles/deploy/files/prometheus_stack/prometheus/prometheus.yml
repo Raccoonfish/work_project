@@ -1,0 +1,29 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+- job_name: node
+  static_configs:
+  - targets: [ 'node-exporter:9110' ]
+
+- job_name: app.py
+  scrape_interval: 15s
+  static_configs:
+  - targets: [ 'python_app:7000' ]
+
+- job_name: app.java
+  scrape_interval: 15s
+  static_configs:
+  - targets: [ 'java_app:9404' ]
+
+#
+#rule_files:
+#  - 'alert.rules'
+#
+#alerting:
+#  alertmanagers:
+#  - scheme: http
+#    static_configs:
+#    - targets:
+#      - "alertmanager:9093"
+#
