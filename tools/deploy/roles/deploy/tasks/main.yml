@@ -1,8 +1,8 @@
 - name: DOCKER LOGIN - Save docker registry pass in tmp file
   community.docker.docker_login:
     registry_url: http://artifactory.infinnity.ru
-    username: e.ishemgulova
-    password: <fhhfrelf1!
+    username: us_name
+    password: ****
 
 - name: Creates directory
   ansible.builtin.file:
