@@ -15,15 +15,3 @@ scrape_configs:
   scrape_interval: 15s
   static_configs:
   - targets: [ 'java_app:9404' ]
-
-#
-#rule_files:
-#  - 'alert.rules'
-#
-#alerting:
-#  alertmanagers:
-#  - scheme: http
-#    static_configs:
-#    - targets:
-#      - "alertmanager:9093"
-#

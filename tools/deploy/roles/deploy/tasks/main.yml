@@ -1,20 +1,8 @@
-#
-# DOCKER LOGIN
-#
 - name: DOCKER LOGIN - Save docker registry pass in tmp file
   community.docker.docker_login:
     registry_url: http://artifactory.infinnity.ru
     username: e.ishemgulova
     password: <fhhfrelf1!
-
-# - name: DOCKER LOGIN - Docker login
-#   shell: cat /tmp/drp.txt | docker login --username {{ registry_user }} --password-stdin {{ registry_host }}
-#   changed_when: false
-
-# - name: DOCKER LOGIN - Remove temporary pass file
-#   file:
-#     path: /tmp/drp.txt
-#     state: absent
 
 - name: Creates directory
   ansible.builtin.file:
