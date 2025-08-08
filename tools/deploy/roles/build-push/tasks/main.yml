@@ -6,6 +6,7 @@
     reauthorize: yes
   delegate_to: 127.0.0.1
 
+#Вместо command можно использовать community.docker.docker_image_build для сборки пуша образа в репозиторий#
 - name: "Build docker image {{ app }}"
   command: docker build -t {{ registry_host }}/{{ path_to_image }}:{{ app_version }} ../../{{ app }}
   delegate_to: 127.0.0.1
