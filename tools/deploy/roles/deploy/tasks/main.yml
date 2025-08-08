@@ -72,25 +72,37 @@
     url: http://10.222.222.70:3000/login
     method: GET
     return_content: no
-    status_code: 200
+  register: _result
+  until: _result.status == 200
+  retries: 20
+  delay: 5
 
 - name: Check if Counter up
   ansible.builtin.uri:
     url: http://10.222.222.70:7000/metrics
     method: GET
     return_content: no
-    status_code: 200
+  register: _result
+  until: _result.status == 200
+  retries: 20
+  delay: 5
 
 - name: Check if Java up
   ansible.builtin.uri:
     url: http://10.222.222.70:8080/metrics
     method: GET
     return_content: no
-    status_code: 200
+  register: _result
+  until: _result.status == 200
+  retries: 20
+  delay: 5
 
 - name: Check if Java_metrics up
   ansible.builtin.uri:
     url: http://10.222.222.70:9404/metrics
     method: GET
     return_content: no
-    status_code: 200
+  register: _result
+  until: _result.status == 200
+  retries: 20
+  delay: 5
